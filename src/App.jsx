@@ -4,6 +4,7 @@ import { usePlayer } from "./hooks/usePlayer";
 import { mapCommitsToMusic } from "./utils/mapper";
 import Layout from "./components/Layout";
 import PlayerControls from "./components/Player/PlayerControls";
+import Timeline from "./components/Timeline/Timeline";
 
 const DUMMY_COMMITS = [
   {
@@ -102,6 +103,54 @@ const DUMMY_COMMITS = [
     deletions: 1,
     files: [],
   },
+  {
+    sha: "9",
+    message: "📝 README 작성",
+    date: "2025-01-03T10:00:00Z",
+    author: "Dev-2A",
+    avatarUrl: null,
+    htmlUrl: "#",
+    filesChanged: 1,
+    additions: 45,
+    deletions: 0,
+    files: [],
+  },
+  {
+    sha: "10",
+    message: "✨ 검색 기능 구현",
+    date: "2025-01-03T11:30:00Z",
+    author: "Dev-2A",
+    avatarUrl: null,
+    htmlUrl: "#",
+    filesChanged: 7,
+    additions: 120,
+    deletions: 15,
+    files: [],
+  },
+  {
+    sha: "11",
+    message: "💄 UI 스타일 개선",
+    date: "2025-01-03T13:00:00Z",
+    author: "Dev-2A",
+    avatarUrl: null,
+    htmlUrl: "#",
+    filesChanged: 4,
+    additions: 60,
+    deletions: 30,
+    files: [],
+  },
+  {
+    sha: "12",
+    message: "🐛 검색 결과 정렬 버그 수정",
+    date: "2025-01-03T13:15:00Z",
+    author: "Dev-2A",
+    avatarUrl: null,
+    htmlUrl: "#",
+    filesChanged: 2,
+    additions: 8,
+    deletions: 4,
+    files: [],
+  },
 ];
 
 function App() {
@@ -126,9 +175,9 @@ function App() {
 
   return (
     <Layout>
-      <div className="flex-1 flex flex-col items-center justify-center gap-6 p-6">
+      <div className="flex-1 flex flex-col items-center gap-6 p-6">
         {/* 테스트 버튼 */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 mt-4">
           <button
             onClick={handleDummyTest}
             className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-medium text-sm transition-colors"
@@ -144,7 +193,6 @@ function App() {
           </button>
         </div>
 
-        {/* 로딩 / 에러 */}
         {loading && progress.total > 0 && (
           <p className="text-gray-400 text-sm">
             커밋 분석 중... {progress.current} / {progress.total}
@@ -152,12 +200,20 @@ function App() {
         )}
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
-        {/* 레포 정보 */}
         {repoInfo && !useDummy && (
           <div className="bg-gray-900 rounded-lg px-4 py-3 text-sm text-gray-300 w-full max-w-lg">
             <span className="font-semibold text-white">{repoInfo.name}</span>
             <span className="text-gray-600 ml-2">⭐ {repoInfo.stars}</span>
           </div>
+        )}
+
+        {/* 타임라인 */}
+        {musicData.length > 0 && (
+          <Timeline
+            musicData={musicData}
+            currentIndex={player.currentIndex}
+            onSeek={player.seekTo}
+          />
         )}
 
         {/* 플레이어 */}
