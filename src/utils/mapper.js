@@ -5,14 +5,15 @@ import { analyzeCommitSentiment } from "./sentiment";
  * 변경 파일 수 → 음계 인덱스 매핑
  */
 function filesToPitchIndex(filesChanged) {
+  const files = filesChanged || 1;
   const clamped = Math.max(
     PITCH_MAP.MIN_FILES,
-    Math.min(PITCH_MAP.MAX_FILES, filesChanged),
+    Math.min(PITCH_MAP.MAX_FILES, files),
   );
   const ratio =
-    (clamped - PITCH_MAP.MAX_FILES) /
+    (clamped - PITCH_MAP.MIN_FILES) /
     (PITCH_MAP.MAX_FILES - PITCH_MAP.MIN_FILES);
-  return Math.round(ratio * PITCH_MAP.MAX_INDEX);
+  return Math.min(Math.round(ratio * PITCH_MAP.MAX_INDEX), PITCH_MAP.MAX_INDEX);
 }
 
 /**
@@ -30,22 +31,17 @@ function intervalToRhythm(intervalMs) {
 
 /**
  * 커밋 배열을 음악 데이터로 변환
- * @param {Array} commits - enriched 커밋 배열 (시간순 정렬)
- * @returns {Array} 음악 이벤트 배열
  */
 export function mapCommitsToMusic(commits) {
+  if (!commits || commits.length === 0) return [];
+
   return commits.map((commit, index) => {
-    // 감정 분석
     const sentiment = analyzeCommitSentiment(commit.message);
 
-    // 음계 선택 (장조/단조)
     const scale = sentiment.mode === "minor" ? NOTES.MINOR : NOTES.MAJOR;
-
-    // 변경 파일 수 → 음높이
     const pitchIndex = filesToPitchIndex(commit.filesChanged);
-    const note = scale[pitchIndex];
+    const note = scale[pitchIndex] || "C4"; // fallback
 
-    // 커밋 간격 → 리듬
     let rhythm = RHYTHM.NORMAL;
     if (index > 0) {
       const prevDate = new Date(commits[index - 1].date);
@@ -54,8 +50,7 @@ export function mapCommitsToMusic(commits) {
       rhythm = intervalToRhythm(interval);
     }
 
-    // 변경 규모 → 볼륨 (0.3 ~ 1.0)
-    const totalChanges = commit.additions + commit.deletions;
+    const totalChanges = (commit.additions || 0) + (commit.deletions || 0);
     const volume = Math.min(1.0, Math.max(0.3, totalChanges / 500 + 0.3));
 
     return {
@@ -66,11 +61,10 @@ export function mapCommitsToMusic(commits) {
       author: commit.author,
       avatarUrl: commit.avatarUrl,
       htmlUrl: commit.htmlUrl,
-      filesChanged: commit.filesChanged,
-      additions: commit.additions,
-      deletions: commit.deletions,
-      files: commit.files,
-      // 음악 매핑 결과
+      filesChanged: commit.filesChanged || 0,
+      additions: commit.additions || 0,
+      deletions: commit.deletions || 0,
+      files: commit.files || [],
       note,
       rhythm,
       volume,
