@@ -2,10 +2,9 @@ import { useState } from "react";
 import { useCommits } from "./hooks/useCommits";
 import { usePlayer } from "./hooks/usePlayer";
 import { mapCommitsToMusic } from "./utils/mapper";
-import { SPEED_OPTIONS } from "./constants/music";
 import Layout from "./components/Layout";
+import PlayerControls from "./components/Player/PlayerControls";
 
-// API 없이 테스트용 더미 커밋
 const DUMMY_COMMITS = [
   {
     sha: "1",
@@ -132,90 +131,38 @@ function App() {
         <div className="flex gap-3">
           <button
             onClick={handleDummyTest}
-            className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-medium transition-colors"
+            className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-medium text-sm transition-colors"
           >
-            🎵 더미 데이터로 소리 테스트
+            🎵 더미 데이터 테스트
           </button>
           <button
             onClick={handleApiTest}
             disabled={loading}
-            className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 rounded-lg font-medium transition-colors"
+            className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 rounded-lg font-medium text-sm transition-colors"
           >
             {loading ? "불러오는 중..." : "🧪 API 테스트"}
           </button>
         </div>
 
+        {/* 로딩 / 에러 */}
         {loading && progress.total > 0 && (
           <p className="text-gray-400 text-sm">
             커밋 분석 중... {progress.current} / {progress.total}
           </p>
         )}
-
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
-        {repoInfo && (
-          <div className="bg-gray-900 rounded-lg p-4 text-sm text-gray-300 w-full max-w-lg">
-            <p className="font-semibold text-white">{repoInfo.name}</p>
+        {/* 레포 정보 */}
+        {repoInfo && !useDummy && (
+          <div className="bg-gray-900 rounded-lg px-4 py-3 text-sm text-gray-300 w-full max-w-lg">
+            <span className="font-semibold text-white">{repoInfo.name}</span>
+            <span className="text-gray-600 ml-2">⭐ {repoInfo.stars}</span>
           </div>
         )}
 
-        {/* 재생 컨트롤 */}
+        {/* 플레이어 */}
         {musicData.length > 0 && (
-          <div className="bg-gray-900 rounded-xl p-6 w-full max-w-lg space-y-4">
-            <div className="flex items-center justify-center gap-3">
-              <button
-                onClick={player.stop}
-                className="w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors"
-              >
-                ⏹
-              </button>
-              <button
-                onClick={player.isPlaying ? player.pause : player.play}
-                className="w-14 h-14 bg-indigo-600 hover:bg-indigo-500 rounded-full flex items-center justify-center text-xl transition-colors"
-              >
-                {player.isPlaying ? "⏸" : "▶️"}
-              </button>
-            </div>
-
-            <div className="flex items-center justify-center gap-2">
-              {SPEED_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => player.changeSpeed(opt.value)}
-                  className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                    player.speed === opt.value
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="text-center text-sm text-gray-400">
-              {player.currentIndex >= 0
-                ? `${player.currentIndex + 1} / ${player.totalCount}`
-                : `대기 중 · ${player.totalCount}개 커밋`}
-            </div>
-
-            {player.currentIndex >= 0 && musicData[player.currentIndex] && (
-              <div className="bg-gray-800 rounded-lg p-3 text-sm">
-                <p className="text-gray-200 truncate">
-                  {musicData[player.currentIndex].message.split("\n")[0]}
-                </p>
-                <div className="flex gap-3 mt-1 text-xs text-gray-500">
-                  <span>🎹 {musicData[player.currentIndex].note}</span>
-                  <span>🥁 {musicData[player.currentIndex].rhythm}</span>
-                  <span>
-                    {musicData[player.currentIndex].scale === "major"
-                      ? "🌞 장조"
-                      : "🌙 단조"}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
+          <PlayerControls player={player} musicData={musicData} />
         )}
       </div>
     </Layout>
