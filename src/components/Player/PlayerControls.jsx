@@ -11,7 +11,7 @@ function PlayerControls({ player, musicData }) {
       : 0;
 
   return (
-    <div className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-lg">
+    <div className="bg-gray-900 rounded-xl overflow-hidden w-full lg:w-80 shrink-0">
       {/* 프로그레스 바 */}
       <div className="h-1 bg-gray-800">
         <div

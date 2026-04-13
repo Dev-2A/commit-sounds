@@ -8,6 +8,7 @@ import RepoBadge from "./components/RepoInput/RepoBadge";
 import PlayerControls from "./components/Player/PlayerControls";
 import Timeline from "./components/Timeline/Timeline";
 import ParticleCanvas from "./components/Particles/ParticleCanvas";
+import CommitDetail from "./components/CommitDetail/CommitDetail";
 
 function App() {
   const { commits, repoInfo, loading, error, progress, loadCommits, reset } =
@@ -31,7 +32,6 @@ function App() {
     setHasSearched(false);
   }, [player, reset]);
 
-  // 초기 화면 (검색 전)
   const showWelcome = !hasSearched && commits.length === 0;
 
   return (
@@ -51,7 +51,7 @@ function App() {
           </div>
         )}
 
-        {/* 레포 입력 또는 레포 배지 */}
+        {/* 레포 입력 / 배지 */}
         {!repoInfo ? (
           <RepoInput
             onSubmit={handleSubmit}
@@ -81,18 +81,24 @@ function App() {
           />
         )}
 
-        {/* 타임라인 */}
+        {/* 타임라인 + 플레이어 + 커밋 상세 */}
         {musicData.length > 0 && (
-          <Timeline
-            musicData={musicData}
-            currentIndex={player.currentIndex}
-            onSeek={player.seekTo}
-          />
-        )}
+          <div className="w-full max-w-4xl flex flex-col items-center gap-6">
+            <Timeline
+              musicData={musicData}
+              currentIndex={player.currentIndex}
+              onSeek={player.seekTo}
+            />
 
-        {/* 플레이어 */}
-        {musicData.length > 0 && (
-          <PlayerControls player={player} musicData={musicData} />
+            {/* 플레이어 + 커밋 상세 가로 배치 */}
+            <div className="w-full flex flex-col lg:flex-row gap-6 items-start justify-center">
+              <PlayerControls player={player} musicData={musicData} />
+              <CommitDetail
+                musicData={musicData}
+                currentIndex={player.currentIndex}
+              />
+            </div>
+          </div>
         )}
       </div>
     </Layout>
