@@ -1,210 +1,75 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useCommits } from "./hooks/useCommits";
 import { usePlayer } from "./hooks/usePlayer";
 import { mapCommitsToMusic } from "./utils/mapper";
 import Layout from "./components/Layout";
+import RepoInput from "./components/RepoInput/RepoInput";
+import RepoBadge from "./components/RepoInput/RepoBadge";
 import PlayerControls from "./components/Player/PlayerControls";
 import Timeline from "./components/Timeline/Timeline";
 import ParticleCanvas from "./components/Particles/ParticleCanvas";
 
-const DUMMY_COMMITS = [
-  {
-    sha: "1",
-    message: "🎉 프로젝트 초기화",
-    date: "2025-01-01T09:00:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 12,
-    additions: 300,
-    deletions: 0,
-    files: [],
-  },
-  {
-    sha: "2",
-    message: "✨ 로그인 기능 추가",
-    date: "2025-01-01T10:30:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 5,
-    additions: 80,
-    deletions: 10,
-    files: [],
-  },
-  {
-    sha: "3",
-    message: "🐛 로그인 버그 수정",
-    date: "2025-01-01T11:00:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 1,
-    additions: 5,
-    deletions: 3,
-    files: [],
-  },
-  {
-    sha: "4",
-    message: "♻️ 컴포넌트 리팩토링",
-    date: "2025-01-01T15:00:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 20,
-    additions: 200,
-    deletions: 150,
-    files: [],
-  },
-  {
-    sha: "5",
-    message: "🚀 배포 설정 완료",
-    date: "2025-01-02T09:00:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 3,
-    additions: 40,
-    deletions: 5,
-    files: [],
-  },
-  {
-    sha: "6",
-    message: "🔥 불필요한 파일 삭제",
-    date: "2025-01-02T09:10:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 8,
-    additions: 0,
-    deletions: 120,
-    files: [],
-  },
-  {
-    sha: "7",
-    message: "✨ 다크모드 구현",
-    date: "2025-01-02T14:00:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 6,
-    additions: 90,
-    deletions: 20,
-    files: [],
-  },
-  {
-    sha: "8",
-    message: "🚑 긴급 핫픽스 적용",
-    date: "2025-01-02T14:05:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 1,
-    additions: 2,
-    deletions: 1,
-    files: [],
-  },
-  {
-    sha: "9",
-    message: "📝 README 작성",
-    date: "2025-01-03T10:00:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 1,
-    additions: 45,
-    deletions: 0,
-    files: [],
-  },
-  {
-    sha: "10",
-    message: "✨ 검색 기능 구현",
-    date: "2025-01-03T11:30:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 7,
-    additions: 120,
-    deletions: 15,
-    files: [],
-  },
-  {
-    sha: "11",
-    message: "💄 UI 스타일 개선",
-    date: "2025-01-03T13:00:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 4,
-    additions: 60,
-    deletions: 30,
-    files: [],
-  },
-  {
-    sha: "12",
-    message: "🐛 검색 결과 정렬 버그 수정",
-    date: "2025-01-03T13:15:00Z",
-    author: "Dev-2A",
-    avatarUrl: null,
-    htmlUrl: "#",
-    filesChanged: 2,
-    additions: 8,
-    deletions: 4,
-    files: [],
-  },
-];
-
 function App() {
-  const { commits, repoInfo, loading, error, progress, loadCommits } =
+  const { commits, repoInfo, loading, error, progress, loadCommits, reset } =
     useCommits();
-  const [useDummy, setUseDummy] = useState(false);
-
-  const source = useDummy ? DUMMY_COMMITS : commits;
-  const musicData = mapCommitsToMusic(source);
+  const musicData = mapCommitsToMusic(commits);
   const player = usePlayer(musicData);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const handleApiTest = () => {
-    setUseDummy(false);
-    player.stop();
-    loadCommits("Dev-2A/commit-sounds", { perPage: 10 });
-  };
+  const handleSubmit = useCallback(
+    (input, options) => {
+      player.stop();
+      setHasSearched(true);
+      loadCommits(input, options);
+    },
+    [player, loadCommits],
+  );
 
-  const handleDummyTest = () => {
-    setUseDummy(true);
+  const handleClear = useCallback(() => {
     player.stop();
-  };
+    reset();
+    setHasSearched(false);
+  }, [player, reset]);
+
+  // 초기 화면 (검색 전)
+  const showWelcome = !hasSearched && commits.length === 0;
 
   return (
     <Layout>
       <div className="flex-1 flex flex-col items-center gap-6 p-6">
-        {/* 테스트 버튼 */}
-        <div className="flex gap-3 mt-2">
-          <button
-            onClick={handleDummyTest}
-            className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-medium text-sm transition-colors"
-          >
-            🎵 더미 데이터 테스트
-          </button>
-          <button
-            onClick={handleApiTest}
-            disabled={loading}
-            className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 rounded-lg font-medium text-sm transition-colors"
-          >
-            {loading ? "불러오는 중..." : "🧪 API 테스트"}
-          </button>
-        </div>
-
-        {loading && progress.total > 0 && (
-          <p className="text-gray-400 text-sm">
-            커밋 분석 중... {progress.current} / {progress.total}
-          </p>
+        {/* 환영 메시지 */}
+        {showWelcome && (
+          <div className="text-center space-y-3 mt-8 mb-4">
+            <p className="text-5xl">🎵</p>
+            <h2 className="text-2xl font-semibold text-gray-200">
+              커밋을 음악으로 들어보세요
+            </h2>
+            <p className="text-gray-500 text-sm max-w-md">
+              GitHub 레포의 커밋 히스토리를 분석해서 음악으로 변환합니다. 커밋
+              시간 → 리듬, 변경 파일 수 → 음높이, 커밋 감정 → 장조/단조
+            </p>
+          </div>
         )}
-        {error && <p className="text-red-400 text-sm">{error}</p>}
 
-        {repoInfo && !useDummy && (
-          <div className="bg-gray-900 rounded-lg px-4 py-3 text-sm text-gray-300 w-full max-w-lg">
-            <span className="font-semibold text-white">{repoInfo.name}</span>
-            <span className="text-gray-600 ml-2">⭐ {repoInfo.stars}</span>
+        {/* 레포 입력 또는 레포 배지 */}
+        {!repoInfo ? (
+          <RepoInput
+            onSubmit={handleSubmit}
+            loading={loading}
+            progress={progress}
+          />
+        ) : (
+          <RepoBadge
+            repoInfo={repoInfo}
+            commitCount={musicData.length}
+            onClear={handleClear}
+          />
+        )}
+
+        {/* 에러 */}
+        {error && (
+          <div className="w-full max-w-lg bg-red-900/20 border border-red-800/50 rounded-lg px-4 py-3">
+            <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
 
