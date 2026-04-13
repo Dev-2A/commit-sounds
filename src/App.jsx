@@ -5,6 +5,7 @@ import { mapCommitsToMusic } from "./utils/mapper";
 import Layout from "./components/Layout";
 import PlayerControls from "./components/Player/PlayerControls";
 import Timeline from "./components/Timeline/Timeline";
+import ParticleCanvas from "./components/Particles/ParticleCanvas";
 
 const DUMMY_COMMITS = [
   {
@@ -177,7 +178,7 @@ function App() {
     <Layout>
       <div className="flex-1 flex flex-col items-center gap-6 p-6">
         {/* 테스트 버튼 */}
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-3 mt-2">
           <button
             onClick={handleDummyTest}
             className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-medium text-sm transition-colors"
@@ -205,6 +206,14 @@ function App() {
             <span className="font-semibold text-white">{repoInfo.name}</span>
             <span className="text-gray-600 ml-2">⭐ {repoInfo.stars}</span>
           </div>
+        )}
+
+        {/* 파티클 캔버스 */}
+        {musicData.length > 0 && (
+          <ParticleCanvas
+            currentIndex={player.currentIndex}
+            musicData={musicData}
+          />
         )}
 
         {/* 타임라인 */}
