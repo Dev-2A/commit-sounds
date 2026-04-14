@@ -90,7 +90,7 @@ function ActiveCommit({ commit, total }) {
         </div>
 
         {/* 음악 매핑 정보 + 변경 통계 */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* 음악 정보 */}
           <div className="bg-gray-800/50 rounded-lg p-3 space-y-2">
             <p className="text-[10px] text-gray-600 uppercase tracking-wider">

@@ -35,7 +35,7 @@ function StatsDashboard({ musicData, isOpen, onToggle }) {
       </button>
 
       {isOpen && (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-slide-down">
           {/* 1행: 핵심 수치 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard label="총 커밋" value={stats.total} icon="📝" />

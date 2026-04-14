@@ -152,7 +152,7 @@ function ParticleCanvas({ currentIndex, musicData }) {
   }, []);
 
   return (
-    <div className="relative w-full max-w-4xl h-48 rounded-xl overflow-hidden bg-gray-950 border border-gray-800/50">
+    <div className="relative w-full max-w-4xl h-36 sm:h-48 rounded-xl overflow-hidden bg-gray-950/80 border border-gray-800/50 backdrop-blur-sm">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
       {/* 현재 음표 표시 오버레이 */}
       {currentIndex >= 0 && musicData?.[currentIndex] && (

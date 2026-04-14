@@ -25,7 +25,7 @@ function RepoInput({ onSubmit, loading, progress }) {
   };
 
   return (
-    <div className="w-full max-w-lg space-y-4">
+    <div className="w-full max-w-lg space-y-4 animate-fade-in">
       {/* 입력 폼 */}
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="flex-1 relative">
@@ -35,7 +35,7 @@ function RepoInput({ onSubmit, loading, progress }) {
             onChange={(e) => setInput(e.target.value)}
             placeholder="owner/repo 또는 GitHub URL"
             disabled={loading}
-            className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
+            className="w-full px-4 py-3 bg-gray-900/80 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 transition-all"
           />
           {loading && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -46,14 +46,14 @@ function RepoInput({ onSubmit, loading, progress }) {
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 disabled:text-gray-500 rounded-lg font-medium text-sm transition-colors shrink-0"
+          className="px-4 sm:px-5 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 disabled:text-gray-500 rounded-lg font-medium text-sm transition-all active:scale-95 shrink-0"
         >
           {loading ? "분석 중" : "🎵 재생"}
         </button>
       </form>
 
       {/* 커밋 수 설정 */}
-      <div className="flex items-center gap-3 px-1">
+      <div className="flex items-center gap-3 px-1 flex-wrap">
         <span className="text-xs text-gray-500">커밋 수</span>
         <div className="flex gap-1">
           {[10, 30, 50, 100].map((n) => (
@@ -71,14 +71,14 @@ function RepoInput({ onSubmit, loading, progress }) {
             </button>
           ))}
         </div>
-        <span className="text-[10px] text-gray-600 ml-auto">
+        <span className="text-[10px] text-gray-600 ml-auto hidden sm:inline">
           비인증 API: 시간당 60회 제한
         </span>
       </div>
 
       {/* 로딩 프로그레스 */}
       {loading && progress.total > 0 && (
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 animate-fade-in">
           <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
             <div
               className="h-full bg-indigo-500 rounded-full transition-all duration-300"
@@ -101,7 +101,7 @@ function RepoInput({ onSubmit, loading, progress }) {
             <button
               key={repo.value}
               onClick={() => handleExample(repo.value)}
-              className="px-2.5 py-1 text-xs bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white rounded-full transition-colors"
+              className="px-2.5 py-1 text-xs bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white rounded-full transition-all active:scale-95 border border-transparent hover:border-gray-700"
             >
               {repo.label}
             </button>
