@@ -17,6 +17,7 @@ import ParticleCanvas from "./components/Particles/ParticleCanvas";
 import CommitDetail from "./components/CommitDetail/CommitDetail";
 import CompareInput from "./components/Compare/CompareInput";
 import CompareView from "./components/Compare/CompareView";
+import StatsDashboard from "./components/Stats/StatsDashboard";
 
 function App() {
   const { commits, repoInfo, loading, error, progress, loadCommits, reset } =
@@ -24,9 +25,10 @@ function App() {
   const musicData = mapCommitsToMusic(commits);
   const player = usePlayer(musicData);
   const [hasSearched, setHasSearched] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
 
   // 모드 전환
-  const [mode, setMode] = useState("single"); // 'single' | 'compare'
+  const [mode, setMode] = useState("single");
 
   // 비교 모드 상태
   const [compareLoading, setCompareLoading] = useState(false);
@@ -40,11 +42,11 @@ function App() {
   const musicB = mapCommitsToMusic(compareDataB);
   const compare = useCompare(musicA, musicB);
 
-  // 단일 모드 핸들러
   const handleSubmit = useCallback(
     (input, options) => {
       player.stop();
       setHasSearched(true);
+      setStatsOpen(false);
       loadCommits(input, options);
     },
     [player, loadCommits],
@@ -54,9 +56,9 @@ function App() {
     player.stop();
     reset();
     setHasSearched(false);
+    setStatsOpen(false);
   }, [player, reset]);
 
-  // 비교 모드 핸들러
   const handleCompareSubmit = useCallback(
     async (inputA, inputB, options) => {
       const parsedA = parseRepoInput(inputA);
@@ -197,6 +199,11 @@ function App() {
                       currentIndex={player.currentIndex}
                     />
                   </div>
+                  <StatsDashboard
+                    musicData={musicData}
+                    isOpen={statsOpen}
+                    onToggle={() => setStatsOpen((v) => !v)}
+                  />
                 </div>
               </>
             )}
